@@ -8,13 +8,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddDbContext<SettlementsContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Settlements"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SettlementsContext"))
 );
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+builder.Services.AddValidationServices();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    SeedData.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
