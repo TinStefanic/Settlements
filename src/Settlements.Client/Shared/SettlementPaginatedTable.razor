@@ -1,0 +1,74 @@
+﻿@using Settlements.Client.DTOs
+@using Settlements.Client.Services
+@inject HostClient HostClient
+
+<table class="table text-center" style="table-layout: fixed">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Country</th>
+            <th>Postal code</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var settlement in PaginatedSettlements?.Settlements ?? Enumerable.Empty<SettlementDTO>())
+        {
+            <DisplayRowSettlement Countries="@Countries" Settlement="@settlement" />
+        }
+    </tbody>
+</table>
+
+<div class="row justify-content-center text-center">
+    <div class="col-auto">
+        <button type="button" class="btn @(HasPreviusPage ? "btn-link" : "disabled")" @onclick="LoadPreviousPage">
+            Previous page
+        </button>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn @(HasNextPage ? "btn-link" : "disabled")" @onclick="LoadNextPage">
+            Next page
+        </button>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
+
+    [Parameter]
+    public PaginatedSettlementsDTO? PaginatedSettlements { get; set; }
+
+    private bool HasPreviusPage => this.PaginatedSettlements?.PageNumber > 1;
+    private bool HasNextPage 
+    {
+        get 
+        {
+            var ps = this.PaginatedSettlements;
+            return ps?.TotalSettlementsCount > ps?.PageSize * ps?.PageNumber;
+        }
+    }
+
+    public async Task LoadPreviousPage()
+    {
+        var currentPage = PaginatedSettlements?.PageNumber;
+        var newPS = await HostClient.GetPaginatedSettlementsDTOAsync(pageNumber: currentPage - 1);
+        UpdatePaginatedSettlements(newPS);
+    }
+
+    public async Task LoadNextPage()
+    {
+        var currentPage = PaginatedSettlements?.PageNumber;
+        var newPS = await HostClient.GetPaginatedSettlementsDTOAsync(pageNumber: currentPage + 1);
+        UpdatePaginatedSettlements(newPS);
+    }
+
+    // To make parent's value update also.
+    private void UpdatePaginatedSettlements(PaginatedSettlementsDTO? newPS)
+    {
+        if (PaginatedSettlements is null || newPS is null) return;
+        PaginatedSettlements.Settlements = newPS.Settlements;
+        PaginatedSettlements.PageNumber = newPS.PageNumber;
+    }
+}

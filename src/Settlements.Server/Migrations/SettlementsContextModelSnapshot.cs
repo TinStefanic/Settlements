@@ -40,8 +40,7 @@ namespace Settlements.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
                     b.ToTable("Countries");
                 });
@@ -68,6 +67,9 @@ namespace Settlements.Server.Migrations
                         .HasColumnType("nvarchar(16)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CountryId", "PostalCode")
+                        .IsUnique();
 
                     b.ToTable("Settlements");
                 });

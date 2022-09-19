@@ -44,7 +44,27 @@ namespace Settlements.Server.Services.ValidationService
 			else
 			{
 				return new ValidationResult(
-					$"Postal code '{postalCode}' doesn't match postal codes of country '{country.Name}'."
+					$"Postal code '{postalCode}' isn't valid postal code of country '{country.Name}'."
+				);
+			}
+		}
+
+		public ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(string postalCode, int countryId)
+		{
+			var settlement = _context.Settlements.FirstOrDefault(
+				s => s.PostalCode == postalCode && s.CountryId == countryId
+			);
+
+			if (settlement is null)
+			{
+				return ValidationResult.Success;
+			}
+
+			else
+			{
+				return new ValidationResult(
+					$"Settlement '{settlement.Name}' already has provided postal code '{postalCode}'"
+					+ " in the same country."
 				);
 			}
 		}

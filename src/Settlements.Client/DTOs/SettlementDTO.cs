@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Settlements.Shared.Contracts
+namespace Settlements.Client.DTOs
 {
-	public class SettlementDto
+	public class SettlementDTO
 	{
-		[Required]
 		public int Id { get; set; }
 
 		[Required]
-		[StringLength(128, MinimumLength = 2)]
-		public string? Country { get; set; }
+		public int? CountryId { get; set; }
 
 		[Required]
 		[StringLength(128, MinimumLength = 2)]

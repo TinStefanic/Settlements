@@ -11,7 +11,7 @@ using Settlements.Server.Data;
 namespace Settlements.Server.Migrations
 {
     [DbContext(typeof(SettlementsContext))]
-    [Migration("20220918115416_Initial")]
+    [Migration("20220919205809_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,7 +23,7 @@ namespace Settlements.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Settlements.Server.Data.Models.CountryModel", b =>
+            modelBuilder.Entity("Settlements.Server.Data.Models.Country", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -42,13 +42,12 @@ namespace Settlements.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                    b.HasIndex("Name");
 
-                    b.ToTable("CountryModel");
+                    b.ToTable("Countries");
                 });
 
-            modelBuilder.Entity("Settlements.Server.Data.Models.SettlementModel", b =>
+            modelBuilder.Entity("Settlements.Server.Data.Models.Settlement", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +55,7 @@ namespace Settlements.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("CountryModelId")
+                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -71,20 +70,10 @@ namespace Settlements.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryModelId");
+                    b.HasIndex("CountryId", "PostalCode")
+                        .IsUnique();
 
                     b.ToTable("Settlements");
-                });
-
-            modelBuilder.Entity("Settlements.Server.Data.Models.SettlementModel", b =>
-                {
-                    b.HasOne("Settlements.Server.Data.Models.CountryModel", "CountryModel")
-                        .WithMany()
-                        .HasForeignKey("CountryModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CountryModel");
                 });
 #pragma warning restore 612, 618
         }

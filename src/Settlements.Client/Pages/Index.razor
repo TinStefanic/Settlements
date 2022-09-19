@@ -1,9 +1,37 @@
 ﻿@page "/"
+@using Settlements.Client.DTOs
+@using Settlements.Client.Services
+@inject HostClient HostClient;
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="text-center">
+    <h3>Total settlements count: @(_paginatedSettlements?.TotalSettlementsCount.ToString() ?? "Loading ...")</h3>
+</div>
 
-Welcome to your new app.
+<SettlementPaginatedTable Countries="@CountriesOrEmpty" PaginatedSettlements="@_paginatedSettlements"/>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<AddNewSettlementForm Countries="@CountriesOrEmpty" OnSuccessfullyAdded="RefreshPageAsync"/>
+
+@code {
+    private IEnumerable<CountryDTO>? _countries;
+    private PaginatedSettlementsDTO? _paginatedSettlements;
+
+    private IEnumerable<CountryDTO> CountriesOrEmpty => _countries ?? Enumerable.Empty<CountryDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _countries = await HostClient.GetCountryDTOsAsync();
+        _paginatedSettlements = await HostClient.GetPaginatedSettlementsDTOAsync();
+        StateHasChanged();
+    }
+
+    private async Task RefreshPageAsync() 
+    {
+        int? pageNumber = _paginatedSettlements?.PageNumber;
+        int? pageSize = _paginatedSettlements?.PageSize;
+
+        _paginatedSettlements = await HostClient.GetPaginatedSettlementsDTOAsync(pageNumber, pageSize);
+        StateHasChanged();
+    }
+}

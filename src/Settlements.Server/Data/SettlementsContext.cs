@@ -14,7 +14,8 @@ namespace Settlements.Server.Data
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Country>().HasIndex(c => c.Name).IsUnique(true);
+			modelBuilder.Entity<Country>().HasIndex(c => c.Name);
+			modelBuilder.Entity<Settlement>().HasIndex(s => new { s.CountryId, s.PostalCode }).IsUnique();
 		}
 	}
 }

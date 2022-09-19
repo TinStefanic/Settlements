@@ -20,5 +20,13 @@ namespace Settlements.Server.Services.ValidationService
 		/// <param name="countryId">Id of country to check.</param>
 		/// <returns>Does country exist, and if it doesn't, error message with details. </returns>
 		ValidationResult? VerifyCountryExists(int countryId);
+
+		/// <summary>
+		/// Verifies if there isn't already settlement with same country and postal code in database.
+		/// </summary>
+		/// <param name="postalCode">Postal code to verify.</param>
+		/// <param name="countryId">Id of country to check with the postal code.</param>
+		/// <returns>Validation result.</returns>
+		ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(string postalCode, int countryId);
 	}
 }

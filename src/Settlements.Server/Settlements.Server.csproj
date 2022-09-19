@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Settlements.Client\Settlements.Client.csproj" />
+    <ProjectReference Include="..\Settlements.Shared\Settlements.Shared.csproj" />
   </ItemGroup>
 
 

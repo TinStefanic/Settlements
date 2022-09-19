@@ -12,7 +12,6 @@ namespace Settlements.Server.Data.Models
 
 		[Required]
 		[CountryExists]
-		[Remote(action: "VerifyCountry", controller: "Settlements")]
 		public int CountryId { get; set; }
 
 		[Required]
@@ -22,7 +21,7 @@ namespace Settlements.Server.Data.Models
 		[Required]
 		[StringLength(16, MinimumLength = 4)]
 		[PostalCodeBelongsToCountry("CountryId")]
-		[Remote(action: "VerifyPostalCode", controller: "Settlements", AdditionalFields = "CountryId")]
+		[PostalCodeIsUniqueToCountry("CountryId")]
 		public string PostalCode { get; set; } = null!;
 	}
 }

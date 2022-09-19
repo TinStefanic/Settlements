@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Settlements.Server.Controllers;
 using Settlements.Server.Data.Models;
-using Settlements.Server.Services.ValidationService;
 using Settlements.UnitTests.Utility;
 
 namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
@@ -14,15 +12,11 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         {
             using var settlementContextFactory = new SettlementsContextFactory();
             using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+            var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+            var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+            var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.GetSettlement(zagreb.Id);
+			var result = await controller.GetSettlement(zagreb.Id);
 
             result.Result.Should().BeOfType<OkObjectResult>();
             result.Value?.Name.Should().Be(zagreb.Name);
@@ -31,17 +25,13 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task GetSettlement_ShouldReturnNotFound_WhenSettlementDoesntExist()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.GetSettlement(zagreb.Id + 1);
+			var result = await controller.GetSettlement(zagreb.Id + 1);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -49,17 +39,13 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task UpdateSettlement_ShouldReturnBadRequest_WhenIdsArentEqual()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.UpdateSettlement(zagreb.Id + 1, zagreb);
+			var result = await controller.UpdateSettlement(zagreb.Id + 1, zagreb);
 
             result.Should().BeOfType<BadRequestResult>();
         }
@@ -67,16 +53,12 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task UpdateSettlement_ShouldReturnNotFound_WhenSettlementDoesntExist()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
-            var splitUntracked =
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
+			var splitUntracked =
                 new Settlement { Id = zagreb.Id + 1, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             var result = await controller.UpdateSettlement(splitUntracked.Id, splitUntracked);
@@ -84,20 +66,16 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
             result.Should().BeOfType<NotFoundResult>();
         }
 
-        [Fact]
+		[Fact]
         public async Task UpdateSettlement_ShouldReturnNoContent_WhenSettlementWasSuccessfullyFound()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.UpdateSettlement(zagreb.Id, zagreb);
+			var result = await controller.UpdateSettlement(zagreb.Id, zagreb);
 
             result.Should().BeOfType<NoContentResult>();
         }
@@ -105,16 +83,12 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task UpdateSettlement_ShouldChangeNameOfSettlement()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
-            var split =
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
+			var split =
                 new Settlement { Id = zagreb.Id, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             await controller.UpdateSettlement(zagreb.Id, split);
@@ -126,16 +100,12 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task CreateSettlement_ShouldReturnCreatedAtAction()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
-            var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
+			var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             var result = await controller.CreateSettlement(split);
 
@@ -145,16 +115,12 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task CreateSettlement_ShouldAddNewSettlementToDatabase()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
-            var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
+			var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             await controller.CreateSettlement(split);
             var settlementInDbWithNameSplit = await context.Settlements.FirstOrDefaultAsync(s => s.Name == split.Name);
@@ -167,9 +133,9 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         {
             using var settlementContextFactory = new SettlementsContextFactory();
             using var context = settlementContextFactory.CreateContext();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.DeleteSettlement(1);
+			var result = await controller.DeleteSettlement(1);
 
             result.Should().BeOfType<NotFoundResult>();
         }
@@ -177,17 +143,13 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task DeleteSettlement_ShouldReturnNoContent_WhenSettlementWasDeletetSuccessfully()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            var result = await controller.DeleteSettlement(zagreb.Id);
+			var result = await controller.DeleteSettlement(zagreb.Id);
 
             result.Should().BeOfType<NoContentResult>();
         }
@@ -195,17 +157,13 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
         [Fact]
         public async Task DeleteSettlement_ShouldRemoveSettlementFromDatabase()
         {
-            using var settlementContextFactory = new SettlementsContextFactory();
-            using var context = settlementContextFactory.CreateContext();
-            var croatia = new Country { Name = "Croatia", RegexPattern = "^\\d{5}$" };
-            context.Countries.Add(croatia);
-            await context.SaveChangesAsync();
-            var zagreb = new Settlement { CountryId = croatia.Id, Name = "Zagreb", PostalCode = "10000" };
-            context.Settlements.Add(zagreb);
-            await context.SaveChangesAsync();
-            var controller = new SettlementsController(context, new CustomSettlementValidationService(context));
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
+			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
+			var controller = ControllerFactory.CreateSettlementController(context);
 
-            await controller.DeleteSettlement(zagreb.Id);
+			await controller.DeleteSettlement(zagreb.Id);
             var settlementWithNameZagreb = await context.Settlements.FirstOrDefaultAsync(s => s.Name == zagreb.Name);
 
             settlementWithNameZagreb.Should().BeNull();

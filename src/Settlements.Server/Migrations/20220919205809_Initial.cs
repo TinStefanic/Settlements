@@ -9,7 +9,7 @@ namespace Settlements.Server.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "CountryModel",
+                name: "Countries",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -19,7 +19,7 @@ namespace Settlements.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CountryModel", x => x.Id);
+                    table.PrimaryKey("PK_Countries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -28,40 +28,34 @@ namespace Settlements.Server.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CountryModelId = table.Column<int>(type: "int", nullable: false),
+                    CountryId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
                     PostalCode = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Settlements", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Settlements_CountryModel_CountryModelId",
-                        column: x => x.CountryModelId,
-                        principalTable: "CountryModel",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CountryModel_Name",
-                table: "CountryModel",
-                column: "Name",
-                unique: true);
+                name: "IX_Countries_Name",
+                table: "Countries",
+                column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Settlements_CountryModelId",
+                name: "IX_Settlements_CountryId_PostalCode",
                 table: "Settlements",
-                column: "CountryModelId");
+                columns: new[] { "CountryId", "PostalCode" },
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Settlements");
+                name: "Countries");
 
             migrationBuilder.DropTable(
-                name: "CountryModel");
+                name: "Settlements");
         }
     }
 }

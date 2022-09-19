@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data;
 using Settlements.Server.Data.Models;
+using Settlements.Server.DTOs;
 using Settlements.Server.Services.ValidationService;
-using System.ComponentModel.DataAnnotations;
 
 namespace Settlements.Server.Controllers
 {
@@ -11,16 +11,46 @@ namespace Settlements.Server.Controllers
 	[ApiController]
 	public class SettlementsController : ControllerBase
 	{
+		private int PageSize { get; }
+
 		private readonly SettlementsContext _context;
 		private readonly ICustomSettlementValidationService _settlementValidator;
+		private readonly IConfiguration _configuration;
 
-		public SettlementsController(SettlementsContext context, ICustomSettlementValidationService settlementValidator)
+		public SettlementsController(
+			SettlementsContext context, 
+			ICustomSettlementValidationService settlementValidator,
+			IConfiguration configuration)
 		{
 			_context = context;
 			_settlementValidator = settlementValidator;
+			_configuration = configuration;
+
+			PageSize = _configuration.GetValue("Pagination:PageSize", 4);
 		}
 
-		[HttpGet("{id}")]
+		[HttpGet]
+		public async Task<ActionResult<PaginatedSettlements>> GetPaginatedSettlements(
+			int pageNumber = 1,
+			int pageSize = 0)
+		{
+			if (pageNumber < 1) pageNumber = 1;
+			if (pageSize <= 0) pageSize = PageSize;
+
+			var paginatedSettlements = 
+				await _context.Settlements.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+			int totalSettlementsCount = await _context.Settlements.CountAsync();
+
+			return new PaginatedSettlements
+			{
+				PageNumber = pageNumber,
+				PageSize = pageSize,
+				Settlements = paginatedSettlements,
+				TotalSettlementsCount = totalSettlementsCount
+			};
+		}
+
+		[HttpGet("{id:int}")]
 		public async Task<ActionResult<Settlement>> GetSettlement(int id)
 		{
 			var settlement = await _context.Settlements.FindAsync(id);
@@ -33,8 +63,8 @@ namespace Settlements.Server.Controllers
 			return Ok(settlement);
 		}
 
-		[HttpPut("{id}")]
-		public async Task<IActionResult> UpdateSettlement(int id, Settlement updatedSettlement)
+		[HttpPut("{id:int}")]
+		public async Task<IActionResult> UpdateSettlement([FromRoute] int id, [FromBody] Settlement updatedSettlement)
 		{
 			if (id != updatedSettlement.Id)
 			{
@@ -65,19 +95,19 @@ namespace Settlements.Server.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult<Settlement>> CreateSettlement(Settlement settlement)
+		public async Task<ActionResult<Settlement>> CreateSettlement([FromBody] Settlement settlement)
 		{
 			_context.Settlements.Add(settlement);
 			await _context.SaveChangesAsync();
 
 			return CreatedAtAction(
-				nameof(Settlement),
+				nameof(GetSettlement),
 				new { id = settlement.Id },
 				settlement
 			);
 		}
 
-		[HttpDelete("{id}")]
+		[HttpDelete("{id:int}")]
 		public async Task<IActionResult> DeleteSettlement(int id)
 		{
 			var settlement = await _context.Settlements.FindAsync(id);
@@ -92,33 +122,6 @@ namespace Settlements.Server.Controllers
 
 			return NoContent();
 		}
-
-		[AcceptVerbs("GET", "POST")]
-		public JsonResult VerifyCountry(int countryId)
-		{
-			var validationResult = _settlementValidator.VerifyCountryExists(countryId);
-
-			if (validationResult != ValidationResult.Success)
-			{
-				return new JsonResult(validationResult?.ErrorMessage);
-			}
-
-			return new JsonResult(true);
-		}
-
-		[AcceptVerbs("GET", "POST")]
-		public JsonResult VerifyPostalCode(string postalCode, int countryId)
-		{
-			var validationResult = _settlementValidator.VerifyPostalCode(postalCode, countryId);
-
-			if (validationResult != ValidationResult.Success)
-			{
-				return new JsonResult(validationResult?.ErrorMessage);
-			}
-
-			return new JsonResult(true);
-		}
-
 		private bool SettlementExists(int id) => _context.Settlements.Any(t => t.Id == id);
 	}
 }

@@ -1,0 +1,18 @@
+﻿@using Settlements.Client.DTOs
+
+<tr>
+    <td>@Settlement?.Name</td>
+    <td>@SettlementsCountryName</td>
+    <td>@Settlement?.PostalCode</td>
+    <td>Edit</td>
+</tr>
+
+@code {
+    [Parameter]
+    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
+
+    [Parameter]
+    public SettlementDTO? Settlement { get; set; }
+
+    private string SettlementsCountryName => Countries?.First(c => c.Id == Settlement?.CountryId).Name!;
+}

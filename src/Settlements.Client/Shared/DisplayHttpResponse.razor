@@ -1,0 +1,60 @@
+﻿@using System.Text.Json
+
+@if (IsResponseStatusSuccess == true)
+{
+    <div class="text-center text-success">
+        <h5>Successfully added!</h5>
+    </div>
+}
+else if (IsResponseStatusSuccess == false)
+{
+    <div class="text-center text-danger">
+        <ul>
+            @foreach (string error in Errors())
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? ResponseJsonString { get; set; }
+
+    [Parameter]
+    public bool? IsResponseStatusSuccess { get; set; }
+
+    private IEnumerable<string> Errors()
+    {
+        if (ResponseJsonString is null) return Enumerable.Empty<string>();
+
+        var result = new List<string>();
+
+        if (string.IsNullOrEmpty(ResponseJsonString)) return Enumerable.Empty<string>();
+
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>(ResponseJsonString);
+
+        try 
+        {
+            var errorsProperties = jsonElement.GetProperty("errors").EnumerateObject();
+            foreach (var propertyErrors in errorsProperties)
+            {
+                foreach (var error in propertyErrors.Value.EnumerateArray())
+                {
+                    string? errorAsString = error.GetString();
+                    if (errorAsString is not null)
+                    {
+                        result.Add(errorAsString);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        return result;
+    }
+}
