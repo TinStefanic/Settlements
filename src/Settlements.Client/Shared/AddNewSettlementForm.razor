@@ -2,45 +2,60 @@
 @using Settlements.Client.Services
 @inject HostClient HostClient
 
-<EditForm Model="@Settlement" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
-    <DataAnnotationsValidator />
-    <div class="text-center mt-1">
-        <ValidationSummary />
-        <DisplayHttpResponse 
-            ResponseJsonString="@_httpResponseMessageJsonString" 
-            IsResponseStatusSuccess="@_isResponseStatusSuccess"
-        />
-    </div>
+<DisplayHttpResponse ResponseJsonString="@_httpResponseMessageJsonString"
+                     IsResponseStatusSuccess="@_isResponseStatusSuccess" />
 
-    <table class="table text-center" style="table-layout: fixed">
-        <tbody>
-            <tr>
-                <td>Name</td>
-                <td><InputText @bind-Value="Settlement.Name" /></td>
-            </tr>
-            <tr>
-                <td>Country</td>
-                <td>
-                    <InputSelect @bind-Value="Settlement.CountryId">
-                        <option value=0 hidden>&nbsp;</option>
-                        @foreach (var country in Countries)
-                        {
-                            <option value=@country.Id>@country.Name</option>
-                        }
-                    </InputSelect>
-                </td>
-            </tr>
-            <tr>
-                <td>Postal code</td>
-                <td><InputText @bind-Value="Settlement.PostalCode" /></td>
-            </tr>
-        </tbody>
-    </table>
+@if (_displayForm)
+{
+    <EditForm Model="@Settlement" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+        <DataAnnotationsValidator />
 
+        <table class="table text-center" style="table-layout: fixed">
+            <tbody>
+                <tr>
+                    <td class="text-end">Country</td>
+                    <td class="text-start">
+                        <ValidationMessage For="@(() => Settlement.CountryId)" />
+                        <InputSelect @bind-Value="Settlement.CountryId">
+                            <option value=0 hidden>&nbsp;</option>
+                            @foreach (var country in Countries)
+                            {
+                                <option value=@country.Id>@country.Name</option>
+                            }
+                        </InputSelect>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-end">Postal code</td>
+                    <td class="text-start">
+                        <ValidationMessage For="@(() => Settlement.PostalCode)" />
+                        <InputText @bind-Value="Settlement.PostalCode" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-end">Name</td>
+                    <td class="text-start">
+                        <ValidationMessage For="@(() => Settlement.Name)" />
+                        <InputText @bind-Value="Settlement.Name" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-center mt-1">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <div class="text-center mt-1">
+            <button type="buton" class="btn btn-link" @onclick="HandleCancelButtonClick">Cancel</button>
+        </div>
+    </EditForm>
+}
+else
+{
     <div class="text-center mt-1">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" @onclick="HandleCreateNewButtonClick">Create new</button>
     </div>
-</EditForm>
+}
 
 @code {
     [Parameter]
@@ -55,6 +70,8 @@
 
     private bool? _isResponseStatusSuccess;
 
+    private bool _displayForm = false;
+
     private async Task HandleValidSubmit() 
     {
         var response = await HostClient.CreateSettlementDTOAsync(Settlement);
@@ -63,6 +80,7 @@
         if (response.IsSuccessStatusCode)
         {
             Settlement = new SettlementDTO();
+            _displayForm = false;
             await OnSuccessfullyAdded.InvokeAsync();
         }
         else
@@ -75,5 +93,18 @@
     {
         _isResponseStatusSuccess = null;
         _httpResponseMessageJsonString = null;
+    }
+
+    private void HandleCreateNewButtonClick()
+    {
+        _displayForm = true;
+        _isResponseStatusSuccess = null;
+    }
+
+    private void HandleCancelButtonClick()
+    {
+        _displayForm = false;
+        Settlement = new SettlementDTO();
+        _isResponseStatusSuccess = null;
     }
 }

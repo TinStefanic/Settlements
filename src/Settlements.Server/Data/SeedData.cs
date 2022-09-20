@@ -29,12 +29,12 @@ namespace Settlements.Server.Data
 				new Country
 				{
 					Name = "Japan",
-					RegexPattern = "^\\d{7}\\s\\(\\d{3}-\\d{4}\\)$"
+					RegexPattern = "^\\d{3}\\p{Pd}?\\d{4}$" // p{Pd} is used because of these two ... '-', '‑'. 
 				},
 				new Country
 				{
 					Name = "USA",
-					RegexPattern = "^\\b\\d{5}\\b(?:[- ]{1}\\d{4})?$"
+					RegexPattern = "^\\b\\d{5}\\b(?:[\\p{Pd} ]{1}\\d{4})?$"
 				}
 			);
 
@@ -67,7 +67,7 @@ namespace Settlements.Server.Data
 				{
 					CountryId = japanId,
 					Name = "Tokyo",
-					PostalCode = "100‑0000"
+					PostalCode = "100-0000"
 				},
 				new Settlement
 				{

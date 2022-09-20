@@ -11,7 +11,7 @@ using Settlements.Server.Data;
 namespace Settlements.Server.Migrations
 {
     [DbContext(typeof(SettlementsContext))]
-    [Migration("20220919205809_Initial")]
+    [Migration("20220920132127_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

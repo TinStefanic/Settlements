@@ -5,10 +5,6 @@
 
 <PageTitle>Index</PageTitle>
 
-<div class="text-center">
-    <h3>Total settlements count: @(_paginatedSettlements?.TotalSettlementsCount.ToString() ?? "Loading ...")</h3>
-</div>
-
 <SettlementPaginatedTable Countries="@CountriesOrEmpty" PaginatedSettlements="@_paginatedSettlements"/>
 
 <AddNewSettlementForm Countries="@CountriesOrEmpty" OnSuccessfullyAdded="RefreshPageAsync"/>

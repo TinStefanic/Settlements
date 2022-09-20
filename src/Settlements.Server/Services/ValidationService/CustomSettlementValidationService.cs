@@ -49,13 +49,16 @@ namespace Settlements.Server.Services.ValidationService
 			}
 		}
 
-		public ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(string postalCode, int countryId)
+		public ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(
+			string postalCode, 
+			int countryId, 
+			int settlementId)
 		{
 			var settlement = _context.Settlements.FirstOrDefault(
 				s => s.PostalCode == postalCode && s.CountryId == countryId
 			);
 
-			if (settlement is null)
+			if (settlement is null || settlement.Id == settlementId)
 			{
 				return ValidationResult.Success;
 			}

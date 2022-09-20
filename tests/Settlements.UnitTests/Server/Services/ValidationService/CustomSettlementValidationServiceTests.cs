@@ -67,25 +67,44 @@ namespace Settlements.UnitTests.Server.Services.ValidationService
 			var settlementValidator = new CustomSettlementValidationService(context);
 
 			var result = 
-				settlementValidator.VerifyPostalCodeIsntAlreadyPresentForTheCountry(postalCode: "10000", croatia.Id);
+				settlementValidator
+				.VerifyPostalCodeIsntAlreadyPresentForTheCountry(postalCode: "10000", croatia.Id, -1);
 
 			result.Should().Be(ValidationResult.Success);
 		}
 
 		[Fact]
-		public async Task VerifyPostalCodeIsntAlreadyPresentForTheCountry_ShouldReturnValidationFailed()
+		public async Task VerifyPostalCodeIsntAlreadyPresentForTheCountry_ShouldReturnValidationFailed_WhenDifferentCityAlreadyExist()
 		{
 			using var settlementContextFactory = new SettlementsContextFactory();
 			using var context = settlementContextFactory.CreateContext();
 			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia", regexPatern: "^\\d{5}$");
-			var zabreb = 
+			var zagreb = 
 				await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb", postalCode: "10000");
 			var settlementValidator = new CustomSettlementValidationService(context);
 
 			var result = 
-				settlementValidator.VerifyPostalCodeIsntAlreadyPresentForTheCountry(postalCode: "10000", croatia.Id);
+				settlementValidator
+				.VerifyPostalCodeIsntAlreadyPresentForTheCountry(postalCode: "10000", croatia.Id, zagreb.Id + 1);
 
 			result.Should().NotBe(ValidationResult.Success);
+		}
+
+		[Fact]
+		public async Task VerifyPostalCodeIsntAlreadyPresentForTheCountry_ShouldReturnValidationSuccessfull_WhenAlreadyExistingCityIsTheCityBeingVerified()
+		{
+			using var settlementContextFactory = new SettlementsContextFactory();
+			using var context = settlementContextFactory.CreateContext();
+			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia", regexPatern: "^\\d{5}$");
+			var zagreb =
+				await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb", postalCode: "10000");
+			var settlementValidator = new CustomSettlementValidationService(context);
+
+			var result =
+				settlementValidator
+				.VerifyPostalCodeIsntAlreadyPresentForTheCountry(postalCode: "10000", croatia.Id, zagreb.Id);
+
+			result.Should().Be(ValidationResult.Success);
 		}
 	}
 }

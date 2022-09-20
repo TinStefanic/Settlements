@@ -21,7 +21,7 @@ namespace Settlements.Server.Data.Models
 		[Required]
 		[StringLength(16, MinimumLength = 4)]
 		[PostalCodeBelongsToCountry("CountryId")]
-		[PostalCodeIsUniqueToCountry("CountryId")]
+		[PostalCodeIsUniqueToCountry("CountryId", "Id")]
 		public string PostalCode { get; set; } = null!;
 	}
 }

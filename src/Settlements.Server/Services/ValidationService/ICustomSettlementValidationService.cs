@@ -26,7 +26,12 @@ namespace Settlements.Server.Services.ValidationService
 		/// </summary>
 		/// <param name="postalCode">Postal code to verify.</param>
 		/// <param name="countryId">Id of country to check with the postal code.</param>
+		/// <param name="settlementId">Id of settlement whose postal code is being checked.</param>
 		/// <returns>Validation result.</returns>
-		ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(string postalCode, int countryId);
+		ValidationResult? VerifyPostalCodeIsntAlreadyPresentForTheCountry(
+			string postalCode, 
+			int countryId, 
+			int settlementId
+		);
 	}
 }
