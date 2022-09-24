@@ -7,8 +7,8 @@ namespace Settlements.Client.Services
 {
 	public class HostClient
 	{
-		private const string _countriesApiUri = "api/countries";
-		private const string _settlementsApiUri = "api/settlements";
+		private const string _countriesApiUri = "api/Countries";
+		private const string _settlementsApiUri = "api/Settlements";
 		private readonly HttpClient _httpClient;
 
 		public HostClient(HttpClient httpClient, IWebAssemblyHostEnvironment hostEnvironment)
