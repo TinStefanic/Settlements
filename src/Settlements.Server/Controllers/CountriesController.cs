@@ -7,6 +7,7 @@ namespace Settlements.Server.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Produces("application/json")]
 	public class CountriesController : ControllerBase
 	{
 		private readonly SettlementsContext _context;
@@ -16,7 +17,13 @@ namespace Settlements.Server.Controllers
 			_context = context;
 		}
 
+		/// <summary>
+		/// Returns all countries.
+		/// </summary>
+		/// <returns></returns>
+		/// <response code="200">Returns all countries</response>
 		[HttpGet]
+		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
 		{
 			return await _context.Countries.ToListAsync();

@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data;
-using Microsoft.Extensions;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,15 @@ builder.Services.AddDbContext<SettlementsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SettlementsContext"))
 );
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(options =>
+{
+	var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+	options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
+
 builder.Services.AddRazorPages();
 
 builder.Services.AddValidationServices();
@@ -29,6 +36,8 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
 	app.UseWebAssemblyDebugging();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 else
 {
