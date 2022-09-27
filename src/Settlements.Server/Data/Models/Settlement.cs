@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Settlements.Server.Attributes.Validation;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Settlements.Server.Data.Models
 {
@@ -11,7 +8,6 @@ namespace Settlements.Server.Data.Models
 		public int Id { get; set; }
 
 		[Required]
-		[CountryExists]
 		public int CountryId { get; set; }
 
 		[Required]
@@ -20,8 +16,6 @@ namespace Settlements.Server.Data.Models
 
 		[Required]
 		[StringLength(16, MinimumLength = 4)]
-		[PostalCodeBelongsToCountry("CountryId")]
-		[PostalCodeIsUniqueToCountry("CountryId", "Id")]
 		public string PostalCode { get; set; } = null!;
 	}
 }

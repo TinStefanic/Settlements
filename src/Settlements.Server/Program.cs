@@ -1,5 +1,9 @@
+using FluentValidation;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data;
+using Settlements.Server.Validators;
+using Settlements.Shared.Validators;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +15,7 @@ builder.Services.AddDbContext<SettlementsContext>(options =>
 );
 
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -19,9 +24,9 @@ builder.Services.AddSwaggerGen(options =>
 	options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 
-builder.Services.AddRazorPages();
-
-builder.Services.AddValidationServices();
+builder.Services.AddFluentValidationRulesToSwagger();
+builder.Services.AddValidatorsFromAssemblyContaining<SettlementDTOValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<SettlementDTOServerValidator>();
 
 var app = builder.Build();
 

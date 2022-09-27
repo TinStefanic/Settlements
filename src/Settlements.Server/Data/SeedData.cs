@@ -10,12 +10,9 @@ namespace Settlements.Server.Data
 			using var context =
 				new SettlementsContext(serviceProvider.GetRequiredService<DbContextOptions<SettlementsContext>>());
 
-			if (context is null)
-			{
-				throw new ArgumentNullException(nameof(context));
-			}
+			ArgumentNullException.ThrowIfNull(context);
 
-			if (context.Settlements.Any())
+			if (context.Settlements.Any() || context.Countries.Any())
 			{
 				return;
 			}

@@ -1,4 +1,4 @@
-﻿namespace Settlements.Client.DTOs
+﻿namespace Settlements.Shared.DTOs
 {
 	public class PaginatedSettlementsDTO
 	{

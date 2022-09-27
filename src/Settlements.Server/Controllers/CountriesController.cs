@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data;
 using Settlements.Server.Data.Models;
+using Settlements.Shared.DTOs;
 
 namespace Settlements.Server.Controllers
 {
@@ -24,9 +26,9 @@ namespace Settlements.Server.Controllers
 		/// <response code="200">Returns all countries</response>
 		[HttpGet]
 		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+		public async Task<ActionResult<IEnumerable<CountryDTO>>> GetCountries()
 		{
-			return await _context.Countries.ToListAsync();
+			return await _context.Countries.Select(c => c.Adapt<CountryDTO>()).ToListAsync();
 		}
 	}
 }

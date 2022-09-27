@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Settlements.Server\Settlements.Server.csproj" />
+    <ProjectReference Include="..\..\src\Settlements.Shared\Settlements.Shared.csproj" />
   </ItemGroup>
 
 </Project>

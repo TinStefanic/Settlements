@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.WebUtilities;
-using Settlements.Client.DTOs;
+using Settlements.Shared.DTOs;
 using System.Net.Http.Json;
 
 namespace Settlements.Client.Services
 {
+	/// <summary>
+	/// Http client to access Settlements.Server api that hosted the client.
+	/// </summary>
 	public class HostClient
 	{
 		private const string _countriesApiUri = "api/Countries";
@@ -25,6 +28,9 @@ namespace Settlements.Client.Services
 		/// <summary>
 		/// Fetches PaginatedSettlements from api, if any parameter is null then it uses servers defaults.
 		/// </summary>
+		/// <param name="pageNumber"></param>
+		/// <param name="pageSize"></param>
+		/// <returns></returns>
 		public async Task<PaginatedSettlementsDTO?> GetPaginatedSettlementsDTOAsync(
 			int? pageNumber = null, 
 			int? pageSize = null)

@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Settlements.Server.Controllers;
 using Settlements.Server.Data;
-using Settlements.Server.Services.ValidationService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Settlements.Server.Validators;
 
 namespace Settlements.UnitTests.Utility
 {
@@ -16,8 +11,8 @@ namespace Settlements.UnitTests.Utility
 		{
 			return new SettlementsController(
 				context,
-				new CustomSettlementValidationService(context),
-				new ConfigurationBuilder().Build()
+				new ConfigurationBuilder().Build(),
+				new SettlementDTOServerValidator(context)
 			);
 		}
 

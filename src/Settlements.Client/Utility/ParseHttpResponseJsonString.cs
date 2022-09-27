@@ -2,46 +2,30 @@
 
 namespace Settlements.Client.Utility
 {
-    public class ParseHttpResponseJsonString
+	public static class ParseHttpResponseErrorsAsDictiionaryExtension
     {
-        private readonly string? _jsonString;
+		public static async Task<Dictionary<string, IEnumerable<string>>> ReadAsErrorDictionaryAsync(
+			this HttpContent response)
+		{
+			var jsonString = await response.ReadAsStringAsync();
 
-        public ParseHttpResponseJsonString(string? jsonString)
-        {
-            _jsonString = jsonString;
-        }
+			if (jsonString is null) return new Dictionary<string, IEnumerable<string>>();
 
-        public IEnumerable<string> ToIEnumerableString()
-        {
-			if (_jsonString is null) return Enumerable.Empty<string>();
-
-			var result = new List<string>();
-
-			if (string.IsNullOrEmpty(_jsonString)) return Enumerable.Empty<string>();
-
-			var jsonElement = JsonSerializer.Deserialize<JsonElement>(_jsonString);
+			if (string.IsNullOrEmpty(jsonString)) return new Dictionary<string, IEnumerable<string>>();
 
 			try
 			{
-				var errorsProperties = jsonElement.GetProperty("errors").EnumerateObject();
-				foreach (var propertyErrors in errorsProperties)
-				{
-					foreach (var error in propertyErrors.Value.EnumerateArray())
-					{
-						string? errorAsString = error.GetString();
-						if (errorAsString is not null)
-						{
-							result.Add(errorAsString);
-						}
-					}
-				}
+				var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+
+				return jsonElement
+					.GetProperty("errors")
+					.Deserialize<Dictionary<string, IEnumerable<string>>>()
+					?? new Dictionary<string, IEnumerable<string>>();
 			}
 			catch
 			{
-				return Enumerable.Empty<string>();
+				return new Dictionary<string, IEnumerable<string>>();
 			}
-
-			return result;
 		}
     }
 }

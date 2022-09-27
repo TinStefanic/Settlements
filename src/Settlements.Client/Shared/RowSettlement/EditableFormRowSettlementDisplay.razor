@@ -1,0 +1,51 @@
+﻿@using Settlements.Shared.DTOs
+
+
+<table class="table text-center" style="table-layout: fixed">
+    <tbody>
+        <tr>
+            <td>
+                <ValidationMessage For="@(() => Settlement.CountryId)" />
+                <InputSelect @bind-Value="Settlement.CountryId">
+                    <option value=0 hidden>&nbsp;</option>
+                    @foreach (var country in Countries)
+                    {
+                        <option value=@country.Id>@country.Name</option>
+                    }
+                </InputSelect>
+            </td>
+            <td>
+                <ValidationMessage For="@(() => Settlement.PostalCode)" />
+                <InputText @bind-Value="Settlement.PostalCode" />
+            </td>
+            <td>
+                <ValidationMessage For="@(() => Settlement.Name)" />
+                <InputText @bind-Value="Settlement.Name" />
+            </td>
+
+            <td>
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+                <button type="buton" class="btn btn-link" @onclick="HandleCancelButtonClick">
+                    Cancel
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public SettlementDTO Settlement { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnCancelButtonClick { get; set; }
+
+
+    private async Task HandleCancelButtonClick() => await OnCancelButtonClick.InvokeAsync();
+}

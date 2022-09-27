@@ -1,0 +1,25 @@
+﻿@using Settlements.Shared.DTOs
+
+
+<tr>
+    <td class="text-end">Country</td>
+    <td class="text-start">
+        <ValidationMessage For="@(() => Settlement.CountryId)" />
+        <InputSelect @bind-Value="Settlement.CountryId">
+            <option value=0 hidden>&nbsp;</option>
+            @foreach (var country in Countries)
+            {
+                <option value=@country.Id>@country.Name</option>
+            }
+        </InputSelect>
+    </td>
+</tr>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public SettlementDTO Settlement { get; set; } = null!;
+}

@@ -1,5 +1,6 @@
 ﻿@page "/"
-@using Settlements.Client.DTOs
+@using Settlements.Client.Shared.AddNewSettlement
+@using Settlements.Shared.DTOs
 @using Settlements.Client.Services
 @inject HostClient HostClient;
 
@@ -7,13 +8,14 @@
 
 <SettlementPaginatedTable Countries="@CountriesOrEmpty" PaginatedSettlements="@_paginatedSettlements"/>
 
-<AddNewSettlementForm Countries="@CountriesOrEmpty" OnSuccessfullyAdded="RefreshPageAsync"/>
+<AddNewSettlement Countries="@CountriesOrEmpty" OnSuccessfullyAdded="RefreshPageAsync"/>
 
 @code {
     private IEnumerable<CountryDTO>? _countries;
     private PaginatedSettlementsDTO? _paginatedSettlements;
 
     private IEnumerable<CountryDTO> CountriesOrEmpty => _countries ?? Enumerable.Empty<CountryDTO>();
+
 
     protected override async Task OnInitializedAsync()
     {

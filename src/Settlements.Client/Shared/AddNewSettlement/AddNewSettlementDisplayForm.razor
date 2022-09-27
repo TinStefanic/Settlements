@@ -1,0 +1,37 @@
+﻿@using Settlements.Client.Shared.AddNewSettlement.FieldsAsRows
+@using Settlements.Shared.DTOs
+
+
+<table class="table text-center" style="table-layout: fixed">
+    <tbody>
+        <CountryFieldAsRow Countries="@Countries" Settlement="@Settlement" />
+        <PostalCodeFieldAsRow Settlement="@Settlement" />
+        <NameFieldAsRow Settlement="@Settlement" />
+    </tbody>
+</table>
+
+<div class="text-center mt-1">
+    <button type="submit" class="btn btn-primary">
+        Submit
+    </button>
+</div>
+<div class="text-center mt-1">
+    <button type="buton" class="btn btn-link" @onclick="HandleCancelButtonClick">
+        Cancel
+    </button>
+</div>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public SettlementDTO Settlement { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnCancelButtonClick { get; set; }
+
+
+    private async Task HandleCancelButtonClick() => await OnCancelButtonClick.InvokeAsync();
+}

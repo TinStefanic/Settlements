@@ -7,7 +7,7 @@ namespace Settlements.UnitTests.Utility
 {
 	// Based on SampleDbContextFactory from:
 	// https://www.meziantou.net/testing-ef-core-in-memory-using-sqlite.htm
-	public class SettlementsContextFactory : IDisposable
+	public sealed class SettlementsContextFactory : IDisposable
 	{
 		private DbConnection? _connection;
 

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Mapster;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data.Models;
+using Settlements.Shared.DTOs;
 using Settlements.UnitTests.Utility;
 
 namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
@@ -45,7 +47,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
 
-			var result = await controller.UpdateSettlement(zagreb.Id + 1, zagreb);
+			var result = await controller.UpdateSettlement(zagreb.Id + 1, zagreb.Adapt<SettlementDTO>());
 
             result.Should().BeOfType<BadRequestResult>();
         }
@@ -59,7 +61,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
 			var splitUntracked =
-                new Settlement { Id = zagreb.Id + 1, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+                new SettlementDTO { Id = zagreb.Id + 1, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             var result = await controller.UpdateSettlement(splitUntracked.Id, splitUntracked);
 
@@ -75,7 +77,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
 
-			var result = await controller.UpdateSettlement(zagreb.Id, zagreb);
+			var result = await controller.UpdateSettlement(zagreb.Id, zagreb.Adapt<SettlementDTO>());
 
             result.Should().BeOfType<NoContentResult>();
         }
@@ -89,7 +91,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
 			var split =
-                new Settlement { Id = zagreb.Id, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+                new SettlementDTO { Id = zagreb.Id, CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             await controller.UpdateSettlement(zagreb.Id, split);
             var updatedSettlement = await context.Settlements.FirstOrDefaultAsync(s => s.Id == zagreb.Id);
@@ -105,7 +107,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
-			var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+			var split = new SettlementDTO { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             var result = await controller.CreateSettlement(split);
 
@@ -120,7 +122,7 @@ namespace Settlements.UnitTests.Server.Controllers.SettlementsControllerTests
 			var croatia = await context.CreateAndAddCountryAsync(name: "Croatia");
 			var zagreb = await context.CreateAndAddSettlementAsync(countryId: croatia.Id, name: "Zagreb");
 			var controller = ControllerFactory.CreateSettlementController(context);
-			var split = new Settlement { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
+			var split = new SettlementDTO { CountryId = croatia.Id, Name = "Split", PostalCode = "21000" };
 
             await controller.CreateSettlement(split);
             var settlementInDbWithNameSplit = await context.Settlements.FirstOrDefaultAsync(s => s.Name == split.Name);

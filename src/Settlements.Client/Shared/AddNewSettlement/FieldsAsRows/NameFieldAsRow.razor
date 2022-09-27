@@ -1,0 +1,16 @@
+﻿@using Settlements.Shared.DTOs
+
+
+<tr>
+    <td class="text-end">Name</td>
+    <td class="text-start">
+        <ValidationMessage For="@(() => Settlement.Name)" />
+        <InputText @bind-Value="Settlement.Name" />
+    </td>
+</tr>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public SettlementDTO Settlement { get; set; } = null!;
+}

@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Settlements.Server.Data;
+using Settlements.Shared.DTOs;
+using Mapster;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Settlements.Server.Data.Models;
-using Settlements.Server.DTOs;
-using Settlements.Server.Services.ValidationService;
 
 namespace Settlements.Server.Controllers
 {
@@ -15,31 +17,30 @@ namespace Settlements.Server.Controllers
 		private int PageSize { get; }
 
 		private readonly SettlementsContext _context;
-		private readonly ICustomSettlementValidationService _settlementValidator;
 		private readonly IConfiguration _configuration;
+		private readonly IValidator<SettlementDTO> _validator;
 
 		public SettlementsController(
 			SettlementsContext context, 
-			ICustomSettlementValidationService settlementValidator,
-			IConfiguration configuration)
+			IConfiguration configuration,
+			IValidator<SettlementDTO> validator)
 		{
 			_context = context;
-			_settlementValidator = settlementValidator;
 			_configuration = configuration;
-
+			_validator = validator;
 			PageSize = _configuration.GetValue("Pagination:PageSize", 4);
 		}
 
 		/// <summary>
 		/// Returns paged Settlements.
 		/// </summary>
-		/// <param name="pageNumber"> Which page to return, starts from 1</param>
+		/// <param name="pageNumber">Which page to return, starts from 1</param>
 		/// <param name="pageSize">Size of page</param>
 		/// <returns>Settlements page</returns>
 		/// <response code="200">Returns Settlements page</response>
 		[HttpGet]
 		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async Task<ActionResult<PaginatedSettlements>> GetPaginatedSettlements(
+		public async Task<ActionResult<PaginatedSettlementsDTO>> GetPaginatedSettlements(
 			int pageNumber = 1,
 			int pageSize = 4)
 		{
@@ -50,11 +51,11 @@ namespace Settlements.Server.Controllers
 				await _context.Settlements.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 			int totalSettlementsCount = await _context.Settlements.CountAsync();
 
-			return new PaginatedSettlements
+			return new PaginatedSettlementsDTO
 			{
 				PageNumber = pageNumber,
 				PageSize = pageSize,
-				Settlements = paginatedSettlements,
+				Settlements = paginatedSettlements.Select(s => s.Adapt<SettlementDTO>()),
 				TotalSettlementsCount = totalSettlementsCount
 			};
 		}
@@ -69,7 +70,7 @@ namespace Settlements.Server.Controllers
 		[HttpGet("{id:int}")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<ActionResult<Settlement>> GetSettlement(int id)
+		public async Task<ActionResult<SettlementDTO>> GetSettlement(int id)
 		{
 			var settlement = await _context.Settlements.FindAsync(id);
 
@@ -78,7 +79,7 @@ namespace Settlements.Server.Controllers
 				return NotFound();
 			}
 
-			return Ok(settlement);
+			return Ok(settlement.Adapt<SettlementDTO>());
 		}
 
 		/// <summary>
@@ -94,8 +95,18 @@ namespace Settlements.Server.Controllers
 		[ProducesResponseType(StatusCodes.Status204NoContent)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		[ProducesResponseType(StatusCodes.Status404NotFound)]
-		public async Task<IActionResult> UpdateSettlement([FromRoute] int id, [FromBody] Settlement updatedSettlement)
+		public async Task<IActionResult> UpdateSettlement(
+			[FromRoute] int id, 
+			[FromBody] SettlementDTO updatedSettlement)
 		{
+			var result = await _validator.ValidateAsync(updatedSettlement);
+
+			if (!result.IsValid)
+			{
+				result.AddToModelState(ModelState);
+				return ValidationProblem(ModelState);
+			}
+
 			if (id != updatedSettlement.Id)
 			{
 				return BadRequest();
@@ -108,9 +119,7 @@ namespace Settlements.Server.Controllers
 				return NotFound();
 			}
 
-			settlement.PostalCode = updatedSettlement.PostalCode;
-			settlement.Name = updatedSettlement.Name;
-			settlement.CountryId = updatedSettlement.CountryId;
+			updatedSettlement.Adapt(settlement);
 
 			try
 			{
@@ -134,9 +143,17 @@ namespace Settlements.Server.Controllers
 		[HttpPost]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
-		public async Task<ActionResult<Settlement>> CreateSettlement([FromBody] Settlement settlement)
+		public async Task<ActionResult<SettlementDTO>> CreateSettlement([FromBody] SettlementDTO settlement)
 		{
-			_context.Settlements.Add(settlement);
+			var result = await _validator.ValidateAsync(settlement);
+
+			if (!result.IsValid)
+			{
+				result.AddToModelState(ModelState);
+				return ValidationProblem(ModelState);
+			}
+
+			_context.Settlements.Add(settlement.Adapt<Settlement>());
 			await _context.SaveChangesAsync();
 
 			return CreatedAtAction(
