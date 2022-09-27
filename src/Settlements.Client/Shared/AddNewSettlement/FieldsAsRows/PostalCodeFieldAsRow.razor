@@ -1,16 +1,7 @@
-﻿@using Settlements.Shared.DTOs
-
-
-<tr>
+﻿<tr>
     <td class="text-end">Postal code</td>
     <td class="text-start">
         <ValidationMessage For="@(() => Settlement.PostalCode)" />
         <InputText @bind-Value="Settlement.PostalCode" />
     </td>
 </tr>
-
-
-@code {
-    [Parameter, EditorRequired]
-    public SettlementDTO Settlement { get; set; } = null!;
-}

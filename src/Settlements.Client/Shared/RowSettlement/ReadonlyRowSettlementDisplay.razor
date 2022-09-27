@@ -1,7 +1,4 @@
-﻿@using Settlements.Shared.DTOs
-
-
-<table class="table text-center" style="table-layout: fixed">
+﻿<table class="table text-center" style="table-layout: fixed">
     <tbody>
         <tr>
             <td>@SettlementsCountryName</td>
@@ -18,25 +15,3 @@
         </tr>
     </tbody>
 </table>
-
-
-@code {
-    [Parameter, EditorRequired]
-    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
-
-    [Parameter, EditorRequired]
-    public SettlementDTO Settlement { get; set; } = null!;
-
-    [Parameter]
-    public EventCallback OnEditButtonClick { get; set; }
-
-    [Parameter]
-    public EventCallback OnDeleteButtonClick { get; set; }
-
-    private string SettlementsCountryName => Countries.FirstOrDefault(c => c.Id == Settlement.CountryId)?.Name!;
-
-
-    private async Task HandleEditButtonClick() => await OnEditButtonClick.InvokeAsync();
-
-    private async Task HandleDeleteButtonClick() => await OnDeleteButtonClick.InvokeAsync();
-}

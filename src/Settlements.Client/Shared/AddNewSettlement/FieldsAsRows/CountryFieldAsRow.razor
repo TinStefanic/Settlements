@@ -1,7 +1,4 @@
-﻿@using Settlements.Shared.DTOs
-
-
-<tr>
+﻿<tr>
     <td class="text-end">Country</td>
     <td class="text-start">
         <ValidationMessage For="@(() => Settlement.CountryId)" />
@@ -14,12 +11,3 @@
         </InputSelect>
     </td>
 </tr>
-
-
-@code {
-    [Parameter, EditorRequired]
-    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
-
-    [Parameter, EditorRequired]
-    public SettlementDTO Settlement { get; set; } = null!;
-}

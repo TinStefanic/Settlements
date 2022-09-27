@@ -1,6 +1,4 @@
 ﻿@using Settlements.Client.Shared.AddNewSettlement.FieldsAsRows
-@using Settlements.Shared.DTOs
-
 
 <table class="table text-center" style="table-layout: fixed">
     <tbody>
@@ -20,18 +18,3 @@
         Cancel
     </button>
 </div>
-
-
-@code {
-    [Parameter, EditorRequired]
-    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
-
-    [Parameter, EditorRequired]
-    public SettlementDTO Settlement { get; set; } = null!;
-
-    [Parameter]
-    public EventCallback OnCancelButtonClick { get; set; }
-
-
-    private async Task HandleCancelButtonClick() => await OnCancelButtonClick.InvokeAsync();
-}

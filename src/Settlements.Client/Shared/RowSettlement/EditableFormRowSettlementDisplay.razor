@@ -1,7 +1,4 @@
-﻿@using Settlements.Shared.DTOs
-
-
-<table class="table text-center" style="table-layout: fixed">
+﻿<table class="table text-center" style="table-layout: fixed">
     <tbody>
         <tr>
             <td>
@@ -34,18 +31,3 @@
         </tr>
     </tbody>
 </table>
-
-
-@code {
-    [Parameter, EditorRequired]
-    public SettlementDTO Settlement { get; set; } = null!;
-
-    [Parameter, EditorRequired]
-    public IEnumerable<CountryDTO> Countries { get; set; } = null!;
-
-    [Parameter]
-    public EventCallback OnCancelButtonClick { get; set; }
-
-
-    private async Task HandleCancelButtonClick() => await OnCancelButtonClick.InvokeAsync();
-}
