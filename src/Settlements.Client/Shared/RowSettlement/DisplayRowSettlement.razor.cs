@@ -27,14 +27,14 @@ namespace Settlements.Client.Shared.RowSettlement
 
 		private SettlementDTO? _settlementCopy;
 
-		//Properly initialized in OnInitialized method.
+		//Properly initialized in OnParametersSet method.
 		private EditContext? _editContext;
 		private ValidationMessageStore? _validationMessageStore;
 
 		private bool _readOnly = true;
 
 
-		protected override void OnInitialized()
+		protected override void OnParametersSet()
 		{
 			_readOnly = true;
 			_editContext = new EditContext(Settlement);
@@ -80,7 +80,7 @@ namespace Settlements.Client.Shared.RowSettlement
 			StateHasChanged();
 		}
 
-		private async Task HandleSumbit()
+		private async Task HandleSubmit()
 		{
 			_validationMessageStore!.Clear();
 
